@@ -1,0 +1,36 @@
+#!/bin/bash
+
+function install_backend() {
+    echo "Installing backend environment..."
+
+    # Check if poetry is installed, if not, install it.
+    if ! command -v poetry &> /dev/null
+    then
+        echo "Poetry could not be found. Installing..."
+        pip install poetry
+    fi
+    
+	cd backend
+    poetry install
+
+    pre-commit install -c=.pre-commit-config.yaml
+}
+
+function install_frontend() {
+    echo "Installing frontend environment..."
+
+	cd frontend
+    yarn install
+}
+
+
+case $1 in
+backend)
+    install_backend
+    ;;
+frontend)
+    install_frontend
+    ;;
+esac
+
+
