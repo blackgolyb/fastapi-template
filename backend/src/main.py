@@ -1,20 +1,13 @@
 import uvicorn
-from fastapi import APIRouter, FastAPI, Request
-from loguru import logger
+from fastapi import FastAPI
 from utils.logger import init_logger
 
-main_router = APIRouter()
-
-
-@main_router.get("/")
-def index(request: Request) -> dict[str, str]:
-    logger.info("PONG")
-    return {"ping": "pong!"}
+from src.api.v1.api import api_router
 
 
 def main() -> None:
     app = FastAPI(title="Test Uvicorn Handlers")
-    app.include_router(main_router)
+    app.include_router(api_router)
 
     init_logger(app)
 
