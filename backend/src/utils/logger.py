@@ -118,6 +118,7 @@ def init_logger(
     loggers_names: Optional[list[str]] = None,
     overwrite_loggers_names: Optional[list[str]] = None,
 ) -> None:
+    logging.getLogger("passlib").setLevel(logging.ERROR)
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     app.add_event_handler(
         "startup",
