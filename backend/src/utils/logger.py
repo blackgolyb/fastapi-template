@@ -92,8 +92,12 @@ def replace_logging(
     uvicorn_loggers_names = list(
         filter(lambda x: x.startswith("uvicorn"), logging.root.manager.loggerDict)
     )
+    sqlalchemy_loggers_names = list(
+        filter(lambda x: x.startswith("sqlalchemy"), logging.root.manager.loggerDict)
+    )
     loggers_names = loggers_names or [
         *uvicorn_loggers_names,
+        *sqlalchemy_loggers_names,
     ]
 
     for _logger in get_loggers_by_names(loggers_names):
@@ -103,6 +107,7 @@ def replace_logging(
         "uvicorn",
         # "uvicorn.error",
         "uvicorn.access",
+        "sqlalchemy",
     ]
     for _logger in get_loggers_by_names(overwrite_loggers_names):
         _logger.handlers = [InterceptHandler()]

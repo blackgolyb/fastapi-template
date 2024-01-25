@@ -43,6 +43,7 @@ class PostgresSettings(BaseModel):
 
 class CoreSettings(BaseSettings):
     project_folder: Path = PROJECT_FOLDER
+    project_name: str
     secret_key: str = secrets.token_urlsafe(32)
     debug: bool = False
 

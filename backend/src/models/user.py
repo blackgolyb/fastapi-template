@@ -2,9 +2,7 @@ from datetime import datetime
 from typing import Annotated, Optional
 from uuid import UUID, uuid4
 
-import pydantic
-from pydantic import EmailStr, SecretStr, StringConstraints, field_validator
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic import EmailStr, SecretStr, StringConstraints
 from sqlmodel import Field, SQLModel
 
 from src.core.security import Hasher
@@ -38,25 +36,19 @@ class UserCreate(SQLModel):
     email: EmailStr
     username: UsernameStr
     password: PasswordSecretStr
-    hashed_password: Optional[str] = pydantic.Field(None, validate_default=True)
 
-    @field_validator("hashed_password", mode="after")
-    @classmethod
-    def get_password_hash(cls, v: Optional[str], info: FieldValidationInfo) -> str:
-        if v is not None:
-            return v
-
-        raw_password: SecretStr = info.data["password"]
-        hashed_password = Hasher.get_data_hash(raw_password.get_secret_value())
+    @property
+    def hashed_password(self) -> str:
+        hashed_password = Hasher.get_data_hash(self.password.get_secret_value())
 
         return hashed_password
 
 
 class UserUpdate(SQLModel):
-    email: Optional[EmailStr]
-    username: Optional[UsernameStr]
-    is_admin: Optional[bool]
-    is_active: Optional[bool]
+    email: Optional[EmailStr] = None
+    username: Optional[UsernameStr] = None
+    is_admin: Optional[bool] = None
+    is_active: Optional[bool] = None
 
 
 class UserDelete(SQLModel):

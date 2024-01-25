@@ -9,7 +9,7 @@ from src.core.config import get_settings
 def configure_app() -> FastAPI:
     setting = get_settings()
 
-    app = FastAPI(title="Test Uvicorn Handlers", debug=setting.core.debug)
+    app = FastAPI(title=setting.core.project_name, debug=setting.core.debug)
     app.include_router(api_router)
 
     init_logger(app)

@@ -29,8 +29,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def create(self, data: CreateSchemaType) -> ModelType:
         instance = self.model.from_orm(data)
 
-        async with self.session.begin():
-            self.session.add(instance)
+        self.session.add(instance)
+        await self.session.commit()
 
         return instance
 
@@ -39,15 +39,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for key, value in data_dict.items():
             setattr(instance, key, value)
 
-        async with self.session.begin():
-            self.session.add(instance)
+        self.session.add(instance)
+        await self.session.commit()
 
         return instance
 
-    async def delete(self, id: UUID) -> bool:
+    async def delete(self, id: UUID) -> None:
         async with self.session.begin():
             stmt = delete(self.model).where(self.model.id == id)
-            result = await self.session.execute(stmt)
-            logger.debug(f"delete test {self.model} {result = }")
-
-        return True
+            await self.session.execute(stmt)
