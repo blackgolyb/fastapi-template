@@ -22,32 +22,11 @@ class Logger(metaclass=SingletonMeta):
 
         self.logger = logger
 
-    def debug(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.debug(*args, **kwargs)
+    def __getattr__(self, __name: str, /) -> Any:
+        if hasattr(self.logger, __name):
+            return getattr(self.logger, __name)
 
-    def info(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.info(*args, **kwargs)
-
-    def warning(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.warning(*args, **kwargs)
-
-    def warn(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.warn(*args, **kwargs)
-
-    def error(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.error(*args, **kwargs)
-
-    def exception(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.exception(*args, **kwargs)
-
-    def critical(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.critical(*args, **kwargs)
-
-    def fatal(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.fatal(*args, **kwargs)
-
-    def log(self, *args: Any, **kwargs: Any) -> None:
-        self.logger.log(*args, **kwargs)
+        raise AttributeError(__name)
 
 
 logger = Logger()
