@@ -2,11 +2,55 @@
 import logging
 import sys
 from pprint import pformat
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import FastAPI
-from loguru import logger
-from loguru._defaults import LOGURU_FORMAT
+
+from src.utils.singleton import SingletonMeta
+
+try:
+    from loguru import logger as _loguru_logger
+    from loguru._defaults import LOGURU_FORMAT
+except ImportError:
+    ...
+
+
+class Logger(metaclass=SingletonMeta):
+    def __init__(self, logger: Optional[Any] = None) -> None:
+        if logger is None:
+            logger = logging.getLogger("uvicorn")
+
+        self.logger = logger
+
+    def debug(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.debug(*args, **kwargs)
+
+    def info(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.info(*args, **kwargs)
+
+    def warning(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.warning(*args, **kwargs)
+
+    def warn(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.warn(*args, **kwargs)
+
+    def error(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.error(*args, **kwargs)
+
+    def exception(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.exception(*args, **kwargs)
+
+    def critical(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.critical(*args, **kwargs)
+
+    def fatal(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.fatal(*args, **kwargs)
+
+    def log(self, *args: Any, **kwargs: Any) -> None:
+        self.logger.log(*args, **kwargs)
+
+
+logger = Logger()
 
 
 class InterceptHandler(logging.Handler):
@@ -19,7 +63,7 @@ class InterceptHandler(logging.Handler):
         # Get corresponding Loguru level if it exists
         level: str | int
         try:
-            level = logger.level(record.levelname).name
+            level = _loguru_logger.level(record.levelname).name
         except ValueError:
             level = record.levelno
 
@@ -29,7 +73,7 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back  # type: ignore
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).log(
+        _loguru_logger.opt(depth=depth, exception=record.exc_info).log(
             level, record.getMessage()
         )
 
@@ -67,7 +111,7 @@ def get_loggers_by_names(names: list[str]) -> list[logging.Logger]:
     return [logging.getLogger(name) for name in names]
 
 
-def replace_logging(
+def replace_logging_to_loguru(
     loggers_names: Optional[list[str]] = None,
     overwrite_loggers_names: Optional[list[str]] = None,
 ) -> None:
@@ -113,12 +157,12 @@ def replace_logging(
         _logger.handlers = [InterceptHandler()]
 
     # set logs output, level and format
-    logger.configure(
+    _loguru_logger.configure(
         handlers=[{"sink": sys.stdout, "level": logging.DEBUG, "format": format_record}]
     )
 
 
-def init_logger(
+def init_loguru_logger(
     app: FastAPI,
     loggers_names: Optional[list[str]] = None,
     overwrite_loggers_names: Optional[list[str]] = None,
@@ -127,7 +171,7 @@ def init_logger(
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
     app.add_event_handler(
         "startup",
-        lambda: replace_logging(
+        lambda: replace_logging_to_loguru(
             loggers_names=loggers_names, overwrite_loggers_names=overwrite_loggers_names
         ),
     )

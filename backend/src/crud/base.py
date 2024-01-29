@@ -1,11 +1,12 @@
 from typing import Generic, Optional, Type, TypeVar
 from uuid import UUID
 
-from loguru import logger
 from pydantic import BaseModel
 from sqlmodel import SQLModel, delete, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import SelectOfScalar
+
+from src.utils.logger import logger
 
 ModelType = TypeVar("ModelType", bound=SQLModel)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)

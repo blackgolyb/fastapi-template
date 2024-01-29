@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
-from utils.logger import init_logger
 
 from src.api.v1.api import api_router
 from src.core.config import get_settings
+from src.utils.logger import init_loguru_logger
 
 
 def configure_app() -> FastAPI:
@@ -12,7 +12,7 @@ def configure_app() -> FastAPI:
     app = FastAPI(title=setting.core.project_name, debug=setting.core.debug)
     app.include_router(api_router)
 
-    init_logger(app)
+    init_loguru_logger(app)
 
     return app
 

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Request
-from loguru import logger
 
 from src.api.dependencies import SessionDep, SettingsDep
 from src.crud.user import UserCRUD
 from src.models.user import User, UserCreate, UserUpdate
+from src.utils.logger import logger
 
 router = APIRouter()
 
@@ -18,6 +18,10 @@ async def index(
     logger.info(settings.postgres.user)
     logger.info(settings.postgres.uri)
     logger.info("PONG")
+    logger.info(type(logger.logger))
+    logger.info(logger.logger)
+    logger.info(id(logger.logger))
+    logger.info(id(logger))
     return {"ping": "pong!"}
 
 
