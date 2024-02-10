@@ -41,7 +41,29 @@ class PostgresSettings(BaseModel):
         )
 
 
+class AuthClientSettings(BaseModel):
+    id: str
+    secret: str
+
+
+class AuthProviderSettings(BaseModel):
+    client: AuthClientSettings
+
+    @property
+    def client_id(self) -> str:
+        return self.client.id
+
+    @property
+    def client_secret(self) -> str:
+        return self.client.secret
+
+
+class AuthSettings(BaseModel):
+    google: AuthProviderSettings
+
+
 class CoreSettings(BaseSettings):
+    api_str: str = "/api/v1"
     project_folder: Path = PROJECT_FOLDER
     project_name: str
     secret_key: str = secrets.token_urlsafe(32)
@@ -51,6 +73,7 @@ class CoreSettings(BaseSettings):
 class Settings(BaseSettings):
     core: CoreSettings = Field(default_factory=CoreSettings)
     postgres: PostgresSettings
+    auth: AuthSettings
 
     model_config = SettingsConfigDict(env_nested_delimiter="_")
 

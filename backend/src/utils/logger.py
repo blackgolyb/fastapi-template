@@ -148,6 +148,7 @@ def init_loguru_logger(
 ) -> None:
     logging.getLogger("passlib").setLevel(logging.ERROR)
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
+    Logger().logger = _loguru_logger
     app.add_event_handler(
         "startup",
         lambda: replace_logging_to_loguru(
